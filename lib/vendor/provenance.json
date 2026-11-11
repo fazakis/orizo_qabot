@@ -1,0 +1,38 @@
+{
+  "core": {
+    "sourceRevision": "70616a230f9c9bbaa08df5acae17b00711190dde",
+    "sourceDirectory": "source/core",
+    "dependencies": {
+      "@noble/ciphers": "2.2.0",
+      "@noble/curves": "2.2.0",
+      "@noble/hashes": "2.2.0",
+      "base64-js": "1.5.1",
+      "@zxcvbn-ts/core": "4.1.2",
+      "@zxcvbn-ts/language-common": "4.1.3"
+    }
+  },
+  "directory": {
+    "sourceRevision": "11f0d9746bdf8eafa5e4b4d08b425bb59180cd7a",
+    "sourceDirectory": "source/directory",
+    "dependencies": {
+      "@noble/ciphers": "2.2.0",
+      "@noble/curves": "2.2.0",
+      "@noble/hashes": "2.2.0",
+      "base64-js": "1.5.1",
+      "@zxcvbn-ts/core": "4.1.2",
+      "@zxcvbn-ts/language-common": "4.1.3"
+    }
+  },
+  "artifacts": {
+    "vendor/directory.mjs": "77177c1afc3e7686f68cff7887bac6aced48b2740035dc579a25a6bacf8382f1",
+    "vendor/wasm.mjs": "b3ac4242116c03d352105beefbbdc513c3754600f7473a236fed7d6fadf67d54",
+    "vendor/crypto.mjs": "63ad58a3d23732abb4c22b6021916bb28d0741bc5f0e542d3dfd86e397f35bfd",
+    "vendor/runtime_bg.wasm": "b3e12b9e441f38d80599c9c05a3cd0a0dc737847027cf0755cb6c661641f94cd"
+  },
+  "build": {
+    "pathRemapping": true,
+    "rust": "1.93.0",
+    "wasmBindgen": "0.2.126",
+    "target": "wasm32-unknown-unknown"
+  }
+}

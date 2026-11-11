@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@noble/ciphers": "2.2.0",
+    "@noble/curves": "2.2.0",
+    "@noble/hashes": "2.2.0",
+    "base64-js": "1.5.1",
+    "@zxcvbn-ts/core": "4.1.2",
+    "@zxcvbn-ts/language-common": "4.1.3"
+  }
+}

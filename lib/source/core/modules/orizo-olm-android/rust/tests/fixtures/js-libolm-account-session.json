@@ -1,0 +1,18 @@
+{
+  "pickleKey": "bGliLW9sbS1waWNrbGUta2V5LWlzLXV0Zjg=",
+  "accountPickle": "2k12tp1oxULfCObrKuv65269zNiz75xcuiCA25PuLgQQHbsLUn47lmuaHIo3zVZnHEu6vzxnngIGt+8BmXAvEsl6LDhqzqZcKP+EjLVLK+ok3s6q+sWvftT4Xoye6cgsqMOAbbcogawDUQEj3mhsQa8gT2h0W/yjGbDPJTU9glO3S97Au7uzRHmt/uLM7MuO7How4Bo/cGqJUa1+HTJ1ibrLflWe7L/X81WXtM5hI9Tt3PkvXTu66ZKLVNBq7KjSFsfXBlOiYHUnYvahvutreJAmFkRuPQ6qxFyjh+nU4vWjfyRpoYWKxGNPYF7drwrf9gyN9TvBjSZXm+ahHWKGrGM0EIxnnxJlfEoEud7RPHEx7yjZDlQpkMegq8FsOdh/xv8qK75wwE9l6YVYqBrpevxQnvqNfQBasAcMYljy1TaM0DwTQbofjvHuqcqFhTOe1f0bzUf2r821c5aMGhXzNCZBHDjHfZ1WdLh4/geYa4Rta2SpSA9eudJaZ0MWLG6Zfa1iY7oqKOaejDEjnsou5NXQSE/dA7hZIMlej5VmQyZmixplHaVFdGEUIwkfZHdPLGUtoZeFMI/H5V3FqD9FAOEaOD1sU2ljThyeP6geQiwFs8ltHnG/3xXQFc9QZaOsKpWejTUV2AXHTwGmsT6W5Lbc2Q5yAt2rWW7ttbkhT+I809s7etREK9gI6AEb8Ex4vwg1XMaNqMo",
+  "identityKey": "pV0aAiOS9+Oe3CGswqWqirZQpLBaIOqMVzwW7/UzMT4",
+  "signingKey": "wGbrdq+XIVI9E9H22uk7bytFNqqMM7foKtZKNjWq8fs",
+  "signedMessage": "orizo-native-ed25519-interoperability-v1",
+  "signature": "vAiN0yNLKB6+TBpVcpMc7asVGrQgT5JEs+lyIXB1i5ttb0SvMiIYlqEGMNhVVuXN0n7Rz0R2n5k38cPCXaSGCg",
+  "oneTimeKeyCount": 5,
+  "session": {
+    "deviceId": "fixture-bob",
+    "identityKey": "PhfD+WVxHDZiP8GXilSPFAeS0l4tYyw7FzV/4ACxfwE",
+    "sessionGeneration": 7,
+    "sessionId": "dt8IoxcoSBxyR1h4dWow90vBpPyk3fZdyvKhTfsNJ40",
+    "pickle": "a57HWxSNlb436BQWu/1QIxfDXtoE1XPS6zseGxyrP7EsqAY/PHWgf6EGejqZAEPaqwxg/5OjpyloYeTEZUBkcobHNAcwf5eQpQFnY+eyB1o7ffOJx4sVXeh4LjQK0SgOagSrNrUSQRVqEGFsrJVZMwj4UxoqU29m/JT2MrbsAU8AbkmW5cWNPHQSupyn0WLrIZmlhVZCLSiYoGnLkUoms3i+GcYQkkmUL6dtOopqIg3XapPIYu3h07VG9Weav9oZkuh3M9eN7/AbrhNE5BFGLGXbA+g5Tl77HEkWDHBGhCvdFIRZ1P+nCDfTRsHvikdPZgXGslUzesNtfMHT6naFXihmemWaT/33",
+    "firstMessageType": 0,
+    "firstMessageBody": "AwogHqP7F97TugsVbBXWrXOOev9cvzAVGGVGBoW2QW/nU0ASIA+gE9jpui/oEZChSiMPHPhKt/xugq/tI1bWVvTlLvt7GiClXRoCI5L3457cIazCpaqKtlCksFog6oxXPBbv9TMxPiJPAwogM+SQ9mLLI3GicUx9Nvqsu9WfkfiA+jI8znUWO8RjyW4QACIg7i94FN0ugCnuAqmv7a/Fj2lAAQuh1PAzsg9Ieg8c2yC98EZlpNbMjg"
+  }
+}

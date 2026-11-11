@@ -1,0 +1,34 @@
+[package]
+name = "orizo-olm-android"
+version = "1.0.0"
+edition = "2024"
+license = "Apache-2.0"
+publish = false
+
+[lib]
+name = "orizo_olm_android"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+base64 = "0.22.1"
+argon2 = { version = "0.5.3", default-features = false, features = ["alloc", "zeroize"] }
+chacha20poly1305 = "0.11.0"
+chacha20 = { version = "0.10", features = ["xchacha", "zeroize"] }
+poly1305 = { version = "0.9", features = ["zeroize"] }
+sha2 = "0.11.0"
+hkdf = "0.13.0"
+x25519-dalek = "3.0.0"
+getrandom = "0.4.3"
+jni = { version = "0.21.1", default-features = false }
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = { version = "1.0.150", features = ["preserve_order"] }
+thiserror = "2.0.18"
+vodozemac = { git = "https://github.com/matrix-org/vodozemac.git", rev = "2c3d967b4cd5c091029002032613d7781727e93d", default-features = false, features = ["libolm-compat", "precomputed-tables"] }
+zeroize = "1.9.0"
+
+[profile.release]
+codegen-units = 1
+lto = "thin"
+opt-level = "s"
+panic = "unwind"
+strip = "symbols"

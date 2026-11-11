@@ -1,0 +1,58 @@
+{
+  "version": 2,
+  "syntheticFixtureOnly": true,
+  "context": {
+    "conversation_id": "11111111-2222-4333-8444-555555555555",
+    "client_message_id": "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee",
+    "user_id": 42,
+    "device_id": "linked-device",
+    "session_generation": 0,
+    "event_type": "message",
+    "cipher_nonce": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYX",
+    "ciphertext": "5eB5GuKh5MFdZhz/53DDgSUjCp/foniTCzgTlF/CkSB8PJS3OAl9DLDhxzrvQCYWGdWQdCUbjndju/5Y/JQlk9cCgss58lWvtblQ3uW3l/XApkU="
+  },
+  "binding": {
+    "version": 2,
+    "certificateId": "4180ef97a6d085fee29e6c4cc2f65586c26fc0ef90901ec0a15f24823ccaef05",
+    "certificates": [
+      {
+        "id": "4180ef97a6d085fee29e6c4cc2f65586c26fc0ef90901ec0a15f24823ccaef05",
+        "body": {
+          "version": 1,
+          "purpose": "device",
+          "userId": 42,
+          "accountSigningKey": "A6EHv/POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg=",
+          "issuerCertificateId": "c91433e363b4acb2d4dfb5cdec3ed031b636326476d835b653cdb5e81c9a962e",
+          "canApprove": true,
+          "deviceId": "linked-device",
+          "identityKey": "MzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzM=",
+          "signingKey": "Kay64UG8yvCyLhqU000LxzYeUm0L/hLIl5S8kyKWbdc=",
+          "notificationKeyHash": "DWuhm2JTHMsN64gEMT7KKDxpVg9m8be4osFZKujDXGs="
+        },
+        "signature": "ONF/Q7duxqdwmRiCqtJy0etS0mAmrylUJYYHNJ5i9KDNYTWwn0IMwy9D3UnhQpssIIHWVS7BWihi8OUX+eJ5DQ=="
+      },
+      {
+        "id": "c91433e363b4acb2d4dfb5cdec3ed031b636326476d835b653cdb5e81c9a962e",
+        "body": {
+          "version": 1,
+          "purpose": "device",
+          "userId": 42,
+          "accountSigningKey": "A6EHv/POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg=",
+          "issuerCertificateId": null,
+          "canApprove": true,
+          "deviceId": "root-device",
+          "identityKey": "MTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTE=",
+          "signingKey": "A6EHv/POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg=",
+          "notificationKeyHash": "DWuhm2JTHMsN64gEMT7KKDxpVg9m8be4osFZKujDXGs="
+        },
+        "signature": "NK2tXOgoygvWRVWxSH9FPr3ZhCVX4xClbTplTCNW4lwXwDzJZwyUVIDYF3VG7mMoU+1OgmT/IuAy9ctHw++lAA=="
+      }
+    ],
+    "signature": "H6lZJxtyZAXCqXi1oI/TINA147wymHpfSjy97lFHUnhWhAAkkkXOOGKqSyTd16zP5OqBpypfnBNY0Z/5t2o7Cg=="
+  },
+  "pinnedAccountKey": "A6EHv/POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg=",
+  "expectedBodyContext": "orizo-message-author-v2\n[2,\"11111111-2222-4333-8444-555555555555\",\"aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee\",42,\"linked-device\",0,\"message\",\"4180ef97a6d085fee29e6c4cc2f65586c26fc0ef90901ec0a15f24823ccaef05\"]",
+  "expectedSignatureAuthorization": "orizo-message-author-signature-v2\n[\"orizo-message-author-v2\\n[2,\\\"11111111-2222-4333-8444-555555555555\\\",\\\"aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee\\\",42,\\\"linked-device\\\",0,\\\"message\\\",\\\"4180ef97a6d085fee29e6c4cc2f65586c26fc0ef90901ec0a15f24823ccaef05\\\"]\",\"AAECAwQFBgcICQoLDA0ODxAREhMUFRYX\",\"de0bc9895a72f7648c0159e026243756bd34eaa04660412587811073fd90ea1e\"]",
+  "contentKey": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=",
+  "plaintext": "{\"version\":1,\"kind\":\"text\",\"body\":\"Synthetic author-bound message\"}"
+}

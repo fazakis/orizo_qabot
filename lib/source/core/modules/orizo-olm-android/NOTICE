@@ -1,0 +1,21 @@
+Orizo Android Native Messaging Crypto Module
+Copyright 2026 Orizo contributors
+
+This product includes vodozemac from the Matrix.org Foundation C.I.C.:
+https://github.com/matrix-org/vodozemac
+
+Pinned source revision:
+2c3d967b4cd5c091029002032613d7781727e93d
+
+vodozemac is distributed under the Apache License, Version 2.0. Its
+upstream license text is reproduced in LICENSE together with the license
+for this module.
+
+This product also includes RustCrypto `argon2` 0.5.3:
+https://github.com/RustCrypto/password-hashes/tree/argon2-v0.5.3/argon2
+
+RustCrypto `argon2` is distributed under the Apache License, Version 2.0,
+or the MIT License. This module uses it under Apache-2.0.
+
+The resulting Android APK contains compiled native objects only. Rust build
+targets and build outputs are deliberately excluded from source control.

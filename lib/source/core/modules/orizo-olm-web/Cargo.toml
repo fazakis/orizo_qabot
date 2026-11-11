@@ -1,0 +1,15 @@
+[package]
+name = "orizo-olm-web"
+version = "1.0.0"
+edition = "2024"
+publish = false
+license = "Apache-2.0"
+[lib]
+crate-type = ["cdylib"]
+[dependencies]
+orizo-olm-android = { path = "../orizo-olm-android/rust" }
+wasm-bindgen = "=0.2.126"
+getrandom = { version = "0.4.3", features = ["wasm_js"] }
+[profile.release]
+opt-level = "s"
+lto = true

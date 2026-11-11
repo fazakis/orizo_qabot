@@ -1,0 +1,22 @@
+Orizo Bot SDK
+Copyright 2026 Orizo contributors
+
+The SDK JavaScript and extracted Orizo TypeScript sources are distributed under
+AGPL-3.0-only. The Rust crypto adapter under source/core/modules retains its
+Apache-2.0 license. Third-party code retains its original licenses.
+
+The bundled JavaScript includes @noble/ciphers, @noble/curves, @noble/hashes
+(Paul Miller, MIT) and base64-js (beatgammit contributors, MIT). Full notices
+are in licenses/. Exact source dependency versions are in source/*/package.json.
+
+The WebAssembly runtime includes vodozemac (Matrix.org Foundation C.I.C.,
+Apache-2.0), revision 2c3d967b4cd5c091029002032613d7781727e93d, and the locked
+Rust dependencies listed in licenses/rust-dependencies.json. Archive SHA256s
+were checked against Cargo.lock before collecting their license files.
+Dependencies offering Apache-2.0 as an option are used under that option.
+jni-sys-macros, matrix-pickle, matrix-pickle-derive and r-efi omit license files
+from their crates.io archive; their manifests declare Apache-2.0 (or offer it),
+whose complete text is included at licenses/Apache-2.0.txt.
+
+Corresponding Orizo source and reproducible build entrypoints are supplied in
+source/ and scripts/. No access to any private repository is required.

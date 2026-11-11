@@ -1,0 +1,24 @@
+{
+  "name": "orizo-qabot",
+  "version": "0.3.1",
+  "private": true,
+  "type": "module",
+  "description": "Standalone deterministic trainer FAQ bot for Orizo",
+  "engines": {
+    "node": ">=24.22.2"
+  },
+  "scripts": {
+    "start": "node bot.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "test:integration": "node --test tests/integration/*.test.mjs",
+    "test:transport": "node --test tests/transport/*.test.mjs",
+    "demo": "node src/demo.mjs",
+    "test:runtime": "node --test lib/tests/*.test.mjs",
+    "verify:standalone": "node scripts/verify-standalone.mjs",
+    "build:crypto": "cd lib && node scripts/build-vendor.mjs"
+  },
+  "license": "AGPL-3.0-only",
+  "devDependencies": {
+    "esbuild": "0.25.11"
+  }
+}

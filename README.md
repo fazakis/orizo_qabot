@@ -81,3 +81,12 @@ SDK dependency. No sibling repositories or snapshot update tool are needed.
 Run `npm run verify:standalone` and `npm run test:runtime` as well as the tests
 above when changing it. Preserve crypto provenance and licenses. Port fixes
 explicitly to other bot applications when relevant.
+
+## Bot action allowance
+
+The regular allowance is 120 accepted outgoing actions/hour per owner, shared
+across their bots. Idle reads, leases and required encryption maintenance are
+excluded. Accepted messages, attachments, edits and reactions count once;
+retries of an accepted action retain the same operation ID and are not charged
+again. A business-quota 429 pauses outgoing actions until Retry-After, while
+reads and maintenance continue. Technical rate limits remain independent.

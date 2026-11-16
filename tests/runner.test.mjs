@@ -6,7 +6,7 @@ const row={id:'22222222-2222-4222-8222-222222222222',conversation:cid,eventType:
 function fixture({rows=[row],resolved=rows,type='direct',body='warm up',send}={}) {
   const data=new Map(), calls=[], state={decrypts:0};
   const store={get:async k=>data.get(k),set:async(k,v)=>{data.set(k,v);}};
-  const transport={messages:async(id,after)=>after?[]:rows,resolve:async ids=>resolved.filter(r=>ids.includes(r.id)),serialize:async f=>f(),send:async(...args)=>{calls.push(args);if(send)await send(...args);return 'accepted';}};
+  const transport={changes:async cursor=>({bootstrapRequired:!cursor,changes:[],nextCursor:'next',hasMore:false}),messages:async(id,after)=>after?[]:rows,resolve:async ids=>resolved.filter(r=>ids.includes(r.id)),serialize:async f=>f(),send:async(...args)=>{calls.push(args);if(send)await send(...args);return 'accepted';}};
   const options={config:{conversationIds:[cid],allowedUserIds:[2]},me:{id:9,username:'trainer_bot'},store,transport,api:{request:async()=>({id:cid,type})},crypto:{decrypt:async()=>{state.decrypts++;return {version:1,eventType:'message',kind:'text',body};}}};
   return {bot:new QABot(options),options,data,calls,state};
 }
@@ -20,7 +20,7 @@ test('default mode admits a consenting human without a local allowlist but still
 test('failed send keeps checkpoint; restart reuses operation ID',async()=>{
  let fail=true;const f=fixture({send:async()=>{if(fail)throw Error('synthetic failure');}});
  await assert.rejects(f.bot.poll());assert.equal(f.data.size,0);fail=false;
- await new QABot(f.options).poll();assert.equal(f.calls[0][2].operationId,f.calls[1][2].operationId);assert.equal(f.data.size,1);
+ await new QABot(f.options).poll();assert.equal(f.calls[0][2].operationId,f.calls[1][2].operationId);assert.equal(f.data.get('sync-cursor').cursor,'next');
 });
 test('rejects own/bot/unapproved/cross-conversation/expired/view-once/control events before decryption',async()=>{
  for(const change of [{sender:{id:9}},{sender:{id:2,isBot:true}},{sender:{id:3}},{conversation:'other'},{expiresAt:'2000-01-01'},{expiresAt:'invalid'},{viewOnce:true},{viewOnceConsumed:true},{deletedAt:'now'},{eventType:'edit'},{encryptionVersion:'plaintext'}]) {

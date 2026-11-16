@@ -36,6 +36,24 @@ artifact hashes were updated together. Runtime licenses and test fixtures are re
 - Crypto artifact verification passed; no original home-directory paths
   remain in either the WASM or its matching base64 copy.
 
+## Incremental receive verification
+
+The incremental receive change passed all configured gates on Linux with
+Node 24.22.2, networking disabled and the source mounted read-only:
+
+- 30 application tests, including 13 incremental-sync regressions.
+- 1 real-encryption integration test covering baseline, incremental arrivals,
+  restart, decryptable replies and no repeated history download.
+- 42 transport tests and 48 bundled-runtime tests.
+- Standalone imports and crypto artifact integrity verification.
+
+The new regressions cover idle request counts, batched resolution, pagination,
+partial-page retry, baseline overlap, empty/new conversations, explicit cursor
+reset, writer/authentication failures, revoked/unresolvable data, upgrade receipts
+and bounded catch-up. These are synthetic protocol tests, not live latency or
+bandwidth measurements. Live wake-ups are not implemented by the bundled token
+transport; the lightweight five-second check remains intentionally enabled.
+
 ## Limits
 
 Offline regression results are not a new live-production acceptance test. This

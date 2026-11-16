@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {QABot} from '../src/runner.mjs';
+import {OrizoApi} from '../lib/src/api.mjs';
 const cid='11111111-1111-4111-8111-111111111111';
 const mid=n=>`22222222-2222-4222-8222-${String(n).padStart(12,'0')}`;
 const message=n=>({id:mid(n),conversation:cid,eventType:'message',encryptionVersion:'e2ee_olm_v1',sender:{id:2,isBot:false}});
@@ -93,4 +94,18 @@ test('page budget resumes from the last committed cursor instead of dropping cha
  const f=fixture({pages});await f.bot.poll();assert.equal(f.calls.changes.length,20);
  assert.equal(f.data.get('sync-cursor').cursor,'page-19');await f.bot.poll();
  assert.equal(f.calls.changes.at(-1),'page-19');assert.equal(f.data.get('sync-cursor').cursor,'page-20');
+});
+
+test('detail-only sync reset is normalized without treating other HTTP 409 responses as resets',async()=>{
+ const detail='Synchronization cursor expired or invalid. Establish a new baseline without deleting local history.';
+ for(const [path,body,expected] of [
+  ['/api/messages/sync/changes/',{detail},'message_sync_reset_required'],
+  ['/api/messages/sync/changes/',{code:'bot_writer_busy'},'bot_writer_busy'],
+  ['/api/messages/sync/changes/',{detail:'Unknown conflict'},undefined],
+  ['/api/bots/v1/writer-lease/',{detail},undefined],
+ ]) {
+  const api=new OrizoApi({}, {fetchImpl:async()=>new Response(JSON.stringify(body),{status:409})});
+  api.tokens={access:'synthetic-test-token'};
+  await assert.rejects(api.request(path,{method:'POST',lease:false}),error=>error.status===409&&error.code===expected);
+ }
 });

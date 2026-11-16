@@ -41,7 +41,7 @@ artifact hashes were updated together. Runtime licenses and test fixtures are re
 The incremental receive change passed all configured gates on Linux with
 Node 24.22.2, networking disabled and the source mounted read-only:
 
-- 30 application tests, including 13 incremental-sync regressions.
+- 31 application tests, including 14 incremental-sync regressions.
 - 1 real-encryption integration test covering baseline, incremental arrivals,
   restart, decryptable replies and no repeated history download.
 - 42 transport tests and 48 bundled-runtime tests.

@@ -24,7 +24,7 @@ export async function run(config) {
   const transport=new Transport(api,crypto,store);
   const bot=new QABot({config,me,api,crypto,store,transport});
   console.log(`Ready: @${me.username}; encrypted FAQ replies enabled.`);
-  let maintenanceAt=0;
+  let maintenanceAt=0, discoveryAt=0;
   while(!abort.signal.aborted){
    try {
     if(Date.now()>=maintenanceAt){
@@ -33,16 +33,19 @@ export async function run(config) {
      if(devices.find(d=>d.deviceId===crypto.state.deviceId)?.oneTimeKeyCount<12)await transport.serialize(()=>crypto.register());
      maintenanceAt=Date.now()+60000;
     }
-    // The server returns only explicit Start/admin-consented grants, never arbitrary inboxes.
-    for(const r of await api.request('/api/messages/requests/')){
-     if(config.conversationIds.length && !config.conversationIds.includes(r.id))continue;
-     // Sender-limited installations do not automatically accept new conversations.
-     if(config.allowedUserIds.length && !config.conversationIds.includes(r.id))continue;
-     await api.request(`/api/messages/conversations/${r.id}/request-decision/`,{method:'POST',body:{decision:'accept'}});
+    if(Date.now()>=discoveryAt){
+     // The server returns only explicit Start/admin-consented grants, never arbitrary inboxes.
+     for(const r of await api.request('/api/messages/requests/')){
+      if(config.conversationIds.length && !config.conversationIds.includes(r.id))continue;
+      // Sender-limited installations do not automatically accept new conversations.
+      if(config.allowedUserIds.length && !config.conversationIds.includes(r.id))continue;
+      await api.request(`/api/messages/conversations/${r.id}/request-decision/`,{method:'POST',body:{decision:'accept'}});
+     }
+     if(!config.allowedUserIds.length && !config.conversationIds.length)
+      for(const i of await api.request('/api/messages/group-invites/'))await api.request('/api/messages/group-invites/',{method:'POST',body:{inviteId:i.id,decision:'accept'}});
+     bot.config={...config,conversationIds:config.conversationIds.length?config.conversationIds:(await transport.conversations()).map(c=>c.id)};
+     discoveryAt=Date.now()+60000;
     }
-    if(!config.allowedUserIds.length && !config.conversationIds.length)
-     for(const i of await api.request('/api/messages/group-invites/'))await api.request('/api/messages/group-invites/',{method:'POST',body:{inviteId:i.id,decision:'accept'}});
-    bot.config={...config,conversationIds:config.conversationIds.length?config.conversationIds:(await transport.conversations()).map(c=>c.id)};
     await bot.poll();
    }catch(error){
     if([401,403,409].includes(error.status))throw error;

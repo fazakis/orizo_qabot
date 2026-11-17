@@ -34,6 +34,23 @@ For a private test, append `--allow-user 123 --conversation CONVERSATION_UUID`.
 Repeat these options to add entries. Without these optional limits, the bot
 answers users who explicitly start it and mentions in admin-consented groups.
 
+## Incremental receiving
+
+After initial catch-up, the bot asks the sync journal for changes and resolves
+only changed message IDs in batches. It does not download the latest message
+page on every idle check. History is read only to initialize a conversation or
+recover an expired journal cursor, using the saved history checkpoint.
+
+The current token transport does **not** implement live wake-ups: its `connect()`
+method is a placeholder. Incremental checks therefore retain the five-second
+interval; switching to a minute-long interval would delay replies. Conversation
+and invitation discovery runs once per minute, so newly granted chats can take
+up to about a minute to appear. Device maintenance also runs once per minute.
+
+Received-message receipts and journal checkpoints survive restarts. A failed
+page is retried with the same outgoing operation IDs, without replaying its
+completed replies. No message plaintext is added to the checkpoint store.
+
 ## Restart and keys
 
 Stop with Ctrl+C. Start the **same command with the same state folder** again.

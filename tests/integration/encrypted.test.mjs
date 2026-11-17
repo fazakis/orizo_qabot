@@ -16,14 +16,15 @@ const {x25519}=await import(new URL('../vendor/crypto.mjs',import.meta.resolve('
 test('Linux vault: trainee encrypts question, FAQ replies decryptably, restart does not duplicate',async t=>{
  const root=await mkdtemp(join(tmpdir(),'qabot-e2ee-'));t.after(()=>rm(root,{recursive:true,force:true}));
  const keyFile=join(root,'master.key');await writeFile(keyFile,randomBytes(32),{mode:0o600});
- const devices=new Map(),messages=[],cid=randomUUID();
+ const devices=new Map(),messages=[],cid=randomUUID();let historyReads=0;
  const apiFor=id=>({request:async(path,{body,method='GET'}={})=>{
   if(path==='/api/messages/e2ee/devices/') {devices.set(body.deviceId,{...body,userId:id});return {};}
   if(path.endsWith('/recipients/'))return {ready:true,devices:[...devices.values()].map(d=>({...d,isCurrentDevice:d.deviceId===body.currentDeviceId,sessionGeneration:1,...(body.missingDeviceIds.includes(d.deviceId)?{oneTimeKey:{publicKey:Object.values(d.oneTimeKeys)[0]}}:{})})),recoveryVaults:[],membershipVersion:1};
   if(path===`/api/messages/conversations/${cid}/`)return {id:cid,type:'direct'};
+  if(path==='/api/messages/sync/changes/')return {bootstrapRequired:!body.cursor,changes:body.cursor?messages.slice(Number(body.cursor)).map(m=>({messageId:m.id,conversationId:cid})):[],nextCursor:String(messages.length),hasMore:false};
   if(path==='/api/messages/sync/resolve/')return {results:messages.filter(m=>body.messageIds.includes(m.id))};
   if(path.startsWith(`/api/messages/conversations/${cid}/messages/`)) {
-   if(method==='GET')return [...messages].reverse();
+   if(method==='GET'){historyReads++;return [...messages].reverse();}
    const device=[...devices.values()].find(d=>d.userId===id);
    const row={...body,id:randomUUID(),conversation:cid,sender:{id,isBot:id===72},senderIdentityKey:device.identityKey,senderSessionGeneration:1};
    messages.push(row);return row;
@@ -48,4 +49,10 @@ test('Linux vault: trainee encrypts question, FAQ replies decryptably, restart d
  assert.ok(!JSON.stringify(messages).includes(question));assert.ok(!JSON.stringify(messages).includes(answer(question)));
  const deviceId=bot.crypto.state.deviceId;await bot.crypto.close();bot=await peer(72);
  assert.equal(bot.crypto.state.deviceId,deviceId);await new QABot({...bot,config,me}).poll();assert.equal(messages.length,2);
+ const baselineReads=historyReads;
+ await trainee.transport.send(cid,'How should I recover?',{operationId:'question-2'});
+ await new QABot({...bot,config,me}).poll();
+ assert.equal(messages.length,4);assert.equal(historyReads,baselineReads);
+ assert.equal((await trainee.crypto.decrypt(messages[3])).body,answer('How should I recover?'));
+ await new QABot({...bot,config,me}).poll();assert.equal(messages.length,4);
 });

@@ -39,7 +39,10 @@ answers users who explicitly start it and mentions in admin-consented groups.
 After initial catch-up, the bot asks the sync journal for changes and resolves
 only changed message IDs in batches. It does not download the latest message
 page on every idle check. History is read only to initialize a conversation or
-recover an expired journal cursor, using the saved history checkpoint.
+recover an expired journal cursor, using the saved history checkpoint and the
+`event-window` endpoint. Legacy GET message-list requests are not used; sending
+continues to use POST `/messages/`. A failed history read stays pending across
+restarts while other conversations continue through incremental sync.
 
 The current token transport does **not** implement live wake-ups: its `connect()`
 method is a placeholder. Incremental checks therefore retain the five-second
@@ -50,6 +53,10 @@ up to about a minute to appear. Device maintenance also runs once per minute.
 Received-message receipts and journal checkpoints survive restarts. A failed
 page is retried with the same outgoing operation IDs, without replaying its
 completed replies. No message plaintext is added to the checkpoint store.
+Explicit delivery acknowledgments are queued only after durable handling and
+sent in batches of at most 100. Failed acknowledgments retry independently;
+these are delivery receipts, not read receipts. The queue holds at most 1,000
+IDs; if full, receiving applies backpressure rather than dropping receipts.
 
 ## Restart and keys
 

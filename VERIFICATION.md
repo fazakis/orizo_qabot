@@ -54,6 +54,24 @@ and bounded catch-up. These are synthetic protocol tests, not live latency or
 bandwidth measurements. Live wake-ups are not implemented by the bundled token
 transport; the lightweight five-second check remains intentionally enabled.
 
+## Event-window and delivery migration
+
+The updated candidate passed all configured gates on Linux with Node 24.22.2,
+networking disabled and source mounted read-only:
+
+- 39 application tests, including per-chat history recovery across restart,
+  receipt retry, bounded queues, persistence failures and writer fencing.
+- 1 real-encryption integration test: event-window baseline, incremental sync,
+  explicit delivery acknowledgments and decryptable replies after restart.
+  The synthetic API rejects legacy GET message-list requests.
+- 42 transport tests and 52 bundled-runtime tests, including opaque window
+  cursors, chronological catch-up, lifecycle/quote checks and receipt batching.
+- Standalone imports and pinned crypto artifact integrity verification.
+
+No existing bot process, key, account, plugin or server configuration was
+changed for these checks. A fresh live-service exchange and physical-device
+rendering remain unverified. Polling is unchanged; this is not a push transport.
+
 ## Limits
 
 Offline regression results are not a new live-production acceptance test. This

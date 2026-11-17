@@ -11,6 +11,7 @@ function fixture({history=[],pages=[cycle()],resolved=[],initialized=true}={}) {
  const calls={changes:[],messages:[],resolve:[],metadata:[],decrypt:[],send:[]};
  const store={get:async k=>data.get(k),set:async(k,v)=>data.set(k,v)};
  const transport={
+  acceptDelivery:async()=>{},
   changes:async cursor=>{calls.changes.push(cursor);const result=pages.shift();if(result instanceof Error)throw result;return result;},
   messages:async(id,after)=>{calls.messages.push([id,after]);return history;},
   resolve:async ids=>{calls.resolve.push(ids);return resolved.filter(row=>ids.includes(row.id));},
@@ -107,5 +108,95 @@ test('detail-only sync reset is normalized without treating other HTTP 409 respo
   const api=new OrizoApi({}, {fetchImpl:async()=>new Response(JSON.stringify(body),{status:409})});
   api.tokens={access:'synthetic-test-token'};
   await assert.rejects(api.request(path,{method:'POST',lease:false}),error=>error.status===409&&error.code===expected);
+ }
+});
+
+test('failed history is durable across restart and does not stall another conversation',async()=>{
+ const other='33333333-3333-4333-8333-333333333333';
+ const row={...message(1),conversation:other};
+ const f=fixture({resolved:[row],pages:[cycle([row]),cycle()]});
+ f.options.config.conversationIds.push(other);
+ f.data.set(`cursor-${other}`,{messageId:null});f.data.delete(`cursor-${cid}`);
+ let fail=true;
+ f.transport.messages=async id=>{assert.equal(id,cid);if(fail)throw Error('history unavailable');return [];};
+ f.options.api.request=async()=>({id:other,type:'direct'});
+ await f.bot.poll();
+ assert.equal(f.calls.send.length,1);assert.equal(f.data.get('sync-cursor').cursor,'next');
+ assert.deepEqual(f.data.get('baseline-pending').ids,[cid]);
+ fail=false;await new QABot(f.options).poll();
+ assert.deepEqual(f.data.get('baseline-pending').ids,[]);
+ assert.deepEqual(f.data.get(`cursor-${cid}`),{messageId:null});
+});
+test('reset recovery intent persists even for chats with an older history checkpoint',async()=>{
+ const row=message(2);const f=fixture({pages:[cycle([row],{bootstrapRequired:true}),cycle()],resolved:[row]});
+ f.data.set(`cursor-${cid}`,{messageId:mid(1)});
+ let fail=true;f.transport.messages=async(id,after)=>{assert.equal(after,mid(1));if(fail)throw Error('offline');return [row];};
+ await f.bot.poll();assert.equal(f.calls.send.length,0);
+ fail=false;await new QABot(f.options).poll();
+ assert.equal(f.calls.send.length,1);assert.equal(f.data.get(`cursor-${cid}`).messageId,row.id);
+});
+test('delivery failure retries after restart without blocking newer messages or duplicating sends',async()=>{
+ const rows=[message(1),message(2)];const f=fixture({pages:[cycle([rows[0]]),cycle([rows[1]])],resolved:rows});
+ let fail=true;const batches=[];
+ f.transport.acceptDelivery=async ids=>{
+  for(const id of ids)assert.ok(f.data.get(`received-${id}`)?.handled);
+  assert.equal(f.data.get('sync-cursor').cursor,'next');
+  batches.push([...ids]);if(fail)throw Error('receipt offline');
+ };
+ await f.bot.poll();assert.deepEqual(f.data.get('delivery-pending').ids,[mid(1)]);
+ fail=false;await new QABot(f.options).poll();
+ assert.deepEqual(batches,[[mid(1)],[mid(1)],[mid(2)]]);
+ assert.deepEqual(f.data.get('delivery-pending').ids,[]);assert.equal(f.calls.send.length,2);
+});
+test('receipt batches are bounded and full queue retains the replayable journal',async()=>{
+ const f=fixture({pages:[cycle([message(1001)]),cycle([message(1001)])],resolved:[message(1001)]});
+ f.data.set('delivery-pending',{ids:Array.from({length:1000},(_,i)=>mid(i+1))});
+ f.transport.acceptDelivery=async()=>{throw Error('offline');};
+ await assert.rejects(f.bot.poll(),/queue full/);
+ assert.equal(f.data.get('delivery-pending').ids.length,1000);
+ assert.equal(f.data.get('sync-cursor').cursor,'saved');
+ const batches=[];f.transport.acceptDelivery=async ids=>batches.push([...ids]);
+ await new QABot(f.options).poll();
+ assert.equal(f.calls.send.length,1);assert.equal(f.calls.decrypt.length,1);
+ assert.deepEqual(batches.map(ids=>ids.length),[100,100,100,100,100,100,100,100,100,100,1]);
+ assert.deepEqual(f.data.get('delivery-pending').ids,[]);
+});
+test('failed receipt persistence keeps journal replayable after durable handling',async()=>{
+ const row=message(1);const f=fixture({pages:[cycle([row]),cycle([row])],resolved:[row]});
+ const set=f.options.store.set;let fail=true;
+ f.options.store.set=async(k,v)=>{if(k==='delivery-pending'&&fail)throw Error('disk unavailable');return set(k,v);};
+ await assert.rejects(f.bot.poll(),/disk unavailable/);
+ assert.equal(f.data.get('sync-cursor').cursor,'saved');assert.ok(f.data.get(`received-${row.id}`));
+ fail=false;const ack=[];f.transport.acceptDelivery=async ids=>ack.push(...ids);
+ await new QABot(f.options).poll();assert.deepEqual(ack,[row.id]);assert.equal(f.calls.send.length,1);
+});
+test('ACK lost response or post-ACK persistence failure resends IDs, never replies',async()=>{
+ const row=message(1);const f=fixture({pages:[cycle([row]),cycle()],resolved:[row]});
+ const set=f.options.store.set;let fail=true;const ack=[];
+ f.transport.acceptDelivery=async ids=>ack.push(...ids);
+ f.options.store.set=async(k,v)=>{if(k==='delivery-pending'&&!v.ids.length&&fail)throw Error('disk unavailable');return set(k,v);};
+ await assert.rejects(f.bot.poll(),/disk unavailable/);fail=false;
+ await new QABot(f.options).poll();assert.deepEqual(ack,[row.id,row.id]);assert.equal(f.calls.send.length,1);
+});
+test('failed decryption and rejected lifecycle rows never acknowledge delivery',async()=>{
+ const row=message(1);const f=fixture({pages:[cycle([row])],resolved:[row]});
+ f.options.crypto.decrypt=async()=>{throw Error('invalid ciphertext');};
+ f.transport.acceptDelivery=async()=>assert.fail('must not acknowledge');
+ await assert.rejects(f.bot.poll());assert.equal(f.data.has('delivery-pending'),false);
+ for(const patch of [{viewOnce:true},{deletedAt:'now'},{sender:{id:3,isBot:false}},{eventType:'edit'}]){
+  const g=fixture({pages:[cycle([row])],resolved:[{...row,...patch}]});
+  g.transport.acceptDelivery=async()=>assert.fail('must not acknowledge');await g.bot.poll();
+  assert.equal(g.data.has('delivery-pending'),false);
+ }
+});
+test('writer conflicts and authentication failures remain fatal during history and receipt recovery',async()=>{
+ for(const status of [401,409]){
+  const error=Object.assign(Error('fenced'),{status});
+  const f=fixture({initialized:false,pages:[cycle([],{bootstrapRequired:true})]});
+  f.transport.messages=async()=>{throw error;};await assert.rejects(f.bot.poll(),e=>e===error);
+  assert.equal(f.data.has('sync-cursor'),false);
+  const g=fixture();g.data.set('delivery-pending',{ids:[mid(1)]});
+  g.transport.acceptDelivery=async()=>{throw error;};await assert.rejects(g.bot.poll(),e=>e===error);
+  assert.deepEqual(g.calls.changes,[]);
  }
 });
